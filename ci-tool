@@ -1,0 +1,41 @@
+#!/bin/bash
+set -euo pipefail
+
+show_help() {
+  cat <<EOF
+Usage: ci-tool <command> [args...]
+
+Available commands:
+  build     Run a build:             ci-tool build <project> <env> [--flags]
+  status    Show build history:      ci-tool status [options] <project?> <env?> <build?>
+  logs      Show or tail build log:  ci-tool logs [-f] <project> <env> <build>
+  help      Show this help message
+EOF
+}
+
+COMMAND=${1:-help}
+shift || true
+
+# Follow symlink to actual script location
+CI_ROOT="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+export CI_ROOT
+
+case "$COMMAND" in
+  build)
+    "$CI_ROOT/build.sh" "$@"
+    ;;
+  status)
+    "$CI_ROOT/status.sh" "$@"
+    ;;
+  logs)
+    "$CI_ROOT/logs.sh" "$@"
+    ;;
+  help|-h|--help)
+    show_help
+    ;;
+  *)
+    echo "Unknown command: $COMMAND"
+    show_help
+    exit 1
+    ;;
+esac

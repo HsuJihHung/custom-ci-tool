@@ -95,8 +95,8 @@ export CI_HISTORY_FILE="$CI_ROOT/builds/history/$PROJECT/$ENV/history.csv"
     exec >> "$LOG_FILE" 2>&1
 
     STATUS="RUNNING"
-    TIMESTAMP=$(date "+%Y-%m-%dT%H:%M:%S")
-    append_history "$TIMESTAMP" "$PROJECT" "$ENV" "$BUILD_ID" "$STATUS"
+    START_TIME=$(current_time)
+    append_history "$PROJECT" "$ENV" "$BUILD_ID" "$STATUS" "$START_TIME"
 
     echo "Starting build $BUILD_ID for $PROJECT [$ENV]"
 

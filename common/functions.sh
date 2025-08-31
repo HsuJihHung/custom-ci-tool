@@ -12,6 +12,10 @@ increment_build_number() {
   echo "$next"
 }
 
+current_time() {
+  date "+%Y-%m-%dT%H:%M:%S"
+}
+
 validate_required_config() {
   local config_file="$1"
   local missing=()
@@ -39,9 +43,11 @@ update_status() {
   local id="$1"
   local status="$2"
   local tmpfile
+  local end_time="$(current_time)"
+
   tmpfile=$(mktemp)
-  awk -F',' -v OFS=',' -v id="$id" -v status="$status" '
-    $4 == id { $5 = status } { print }
+  awk -F',' -v OFS=',' -v id="$id" -v status="$status" -v end_time="$end_time" '
+    $3 == id { $4 = status; $6 = end_time } { print }
   ' "$CI_HISTORY_FILE" > "$tmpfile"
   mv "$tmpfile" "$CI_HISTORY_FILE"
 }

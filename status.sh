@@ -57,6 +57,6 @@ fi
 
 # Prepend header and let column align everything together
 {
-  echo "TIMESTAMP,PROJECT,ENV,BUILD_ID,STATUS"
+  echo "PROJECT,ENV,BUILD_ID,STATUS,START_TIME,END_TIME"
   printf "%s\n" "$ROWS"
 } | column -t -s ','

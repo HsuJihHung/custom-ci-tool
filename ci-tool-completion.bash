@@ -10,7 +10,7 @@ _ci_tool_completions() {
   ci_tool_path="$(readlink -f "$(command -v ci-tool)")"
   CI_ROOT="$(cd "$(dirname "$ci_tool_path")" && pwd)"
 
-  local commands="build status logs help"
+  local commands="build status logs clear help"
   local cmd="${COMP_WORDS[1]:-}"
 
   # Show top-level commands
@@ -22,6 +22,7 @@ _ci_tool_completions() {
   # Define flags for each command
   local status_flags="-n -h --help"
   local logs_flags="-f -h --help"
+  local clear_flags="-n -y -h --help"
 
   # Collect all positional (non-flag) args starting from index 2
   local positional=()
@@ -31,7 +32,7 @@ _ci_tool_completions() {
 
   local arg1="${positional[0]:-}"  # project
   local arg2="${positional[1]:-}"  # env
-  local arg3="${positional[2]:-}"  # build ID
+  local arg3="${positional[2]:-}"  # build ID (status/logs only)
 
   case "$cmd" in
     build)
@@ -47,7 +48,6 @@ _ci_tool_completions() {
         COMPREPLY=( $(compgen -W "$status_flags" -- "$cur") )
         return
       fi
-
       if [[ ${#positional[@]} -eq 0 ]]; then
         COMPREPLY=( $(compgen -W "$(ls "$CI_ROOT/projects" 2>/dev/null)" -- "$cur") )
       elif [[ ${#positional[@]} -eq 1 ]]; then
@@ -64,7 +64,6 @@ _ci_tool_completions() {
         COMPREPLY=( $(compgen -W "$logs_flags" -- "$cur") )
         return
       fi
-
       if [[ ${#positional[@]} -eq 0 ]]; then
         COMPREPLY=( $(compgen -W "$(ls "$CI_ROOT/projects" 2>/dev/null)" -- "$cur") )
       elif [[ ${#positional[@]} -eq 1 ]]; then
@@ -73,6 +72,18 @@ _ci_tool_completions() {
         local builds_dir="$CI_ROOT/builds/logs/$arg1/$arg2"
         local builds=$(ls "$builds_dir" 2>/dev/null | sed -n 's/build-\([0-9]\+\)\.log/\1/p')
         COMPREPLY=( $(compgen -W "$builds" -- "$cur") )
+      fi
+      ;;
+
+    clear)
+      if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $(compgen -W "$clear_flags" -- "$cur") )
+        return
+      fi
+      if [[ ${#positional[@]} -eq 0 ]]; then
+        COMPREPLY=( $(compgen -W "$(ls "$CI_ROOT/projects" 2>/dev/null)" -- "$cur") )
+      elif [[ ${#positional[@]} -eq 1 ]]; then
+        COMPREPLY=( $(compgen -W "$(ls "$CI_ROOT/projects/$arg1" 2>/dev/null)" -- "$cur") )
       fi
       ;;
   esac

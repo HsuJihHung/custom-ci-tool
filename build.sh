@@ -4,15 +4,15 @@ set -eEuo pipefail
 # === Usage help ===
 show_help() {
   cat <<EOF
-Usage: build.sh <project> <env> [--additional-args]
+Usage: ci-tool build <project> <env> [--additional-args]
 
 Required:
   <project>   Project name (must exist under projects/)
   <env>       Environment name (must exist under the project)
 
 Examples:
-  build.sh project-a dev
-  build.sh my-app staging --my-custom-param
+  ci-tool build project-a dev
+  ci-tool build my-app staging --my-custom-param
 
 Note:
   This script is normally called via: ci-tool build ...

@@ -3,14 +3,14 @@ set -euo pipefail
 
 # === Usage ===
 usage() {
-  echo "Usage: $0 [-f] <project> <env> <build_id>"
+  echo "Usage: ci-tool logs [-f] <project> <env> <build_id>"
   echo ""
   echo "Options:"
   echo "  -f        Tail the log output (like tail -f)"
   echo ""
   echo "Example:"
-  echo "  $0 project-a dev 7"
-  echo "  $0 -f project-a dev 8"
+  echo "  ci-tool logs project-a dev 7"
+  echo "  ci-tool logs -f project-a dev 8"
   exit 1
 }
 

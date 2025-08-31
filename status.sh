@@ -3,15 +3,15 @@ set -euo pipefail
 
 show_usage() {
   echo "Usage:"
-  echo "  ./status.sh [-n <count>] [<project> [<env> [<build_id>]]]"
+  echo "  ci-tool status [-n <count>] [<project> [<env> [<build_id>]]]"
   echo ""
   echo "Examples:"
-  echo "  ./status.sh                      # Show last 5 builds of all projects"
-  echo "  ./status.sh -n 10                # Show last 10 builds of all projects"
-  echo "  ./status.sh project-a            # Show last 5 builds of project-a"
-  echo "  ./status.sh project-a dev        # Show last 5 builds of project-a/dev"
-  echo "  ./status.sh project-a dev 5      # Show ONLY build #5 of project-a/dev"
-  echo "  ./status.sh -n 10 project-a dev  # Show last 10 builds of project-a/dev"
+  echo "  ci-tool status                      # Show last 5 builds of all projects"
+  echo "  ci-tool status -n 10                # Show last 10 builds of all projects"
+  echo "  ci-tool status project-a            # Show last 5 builds of project-a"
+  echo "  ci-tool status project-a dev        # Show last 5 builds of project-a/dev"
+  echo "  ci-tool status project-a dev 5      # Show ONLY build #5 of project-a/dev"
+  echo "  ci-tool status -n 10 project-a dev  # Show last 10 builds of project-a/dev"
 }
 
 COUNT=5
@@ -20,7 +20,20 @@ ARGS=()
 # Parse flags and collect positional args
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -n) COUNT="$2"; shift 2 ;;
+    -n) 
+      # missing value?
+      if [[ $# -lt 2 ]]; then
+        echo "Error: -n requires a count value." >&2
+        show_usage; exit 1
+      fi
+      # numeric? (positive integer)
+      if [[ ! "$2" =~ ^[1-9][0-9]*$ ]]; then
+        echo "Error: -n expects a positive integer (got: '$2')." >&2
+        show_usage; exit 1
+      fi
+      COUNT="$2"
+      shift 2
+      ;;
     -h|--help) show_usage; exit 0 ;;
     -*) echo "Unknown option: $1"; show_usage; exit 1 ;;
     *) ARGS+=("$1"); shift ;;
@@ -41,13 +54,13 @@ ROWS=$(
     [[ -n "$ENV" && "$FILE" != *"/$ENV/"* ]] && continue
 
     if [[ -n "$BUILD_ID" ]]; then
-      awk -F',' -v id="$BUILD_ID" '$4==id {print}' "$FILE"
+      awk -F',' -v id="$BUILD_ID" '$3==id {print}' "$FILE"
     else
       cat "$FILE"
     fi
   done \
-  | awk -F',' -v OFS=',' '{ print $1,$2,$3,$4,$5 }' \
-  | sort -t',' -k1,1r
+  | awk -F',' -v OFS=',' '{ print $1,$2,$3,$4,$5,$6 }' \
+  | sort -t',' -k5,5r
 )
 
 # If BUILD_ID is given, don't trim by COUNT; otherwise take top COUNT after global sort.

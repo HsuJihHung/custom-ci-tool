@@ -9,6 +9,7 @@ Available commands:
   build     Run a build:             ci-tool build <project> <env> [--flags]
   status    Show build history:      ci-tool status [options] <project?> <env?> <build?>
   logs      Show or tail build log:  ci-tool logs [-f] <project> <env> <build>
+  clear     Clean history & logs:    ci-tool clear [-n <keep>] [-y] <project> <env>
   help      Show this help message
 EOF
 }
@@ -29,6 +30,9 @@ case "$COMMAND" in
     ;;
   logs)
     "$CI_ROOT/logs.sh" "$@"
+    ;;
+  clear)
+    "$CI_ROOT/clear.sh" "$@"
     ;;
   help|-h|--help)
     show_help
